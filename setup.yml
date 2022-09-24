@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: yes
+  roles:
+    - { role: base, tags: ["base"] }
+    - { role: ssh, tags: ["ssh"] }
+    - { role: ufw, tags: ["ufw"] }
+    - { role: rust, tags: ["rust"] }
+    - { role: terminal, tags: ["terminal"] }

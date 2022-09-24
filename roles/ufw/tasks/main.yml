@@ -1,0 +1,78 @@
+---
+
+- name: install ufw
+  apt:
+    state: latest
+    package:
+      - ufw
+
+- name: Reset UFW rules
+  ufw: 
+    state: reset
+
+- name: ufw allow ssh traffic
+  ufw: rule=allow port=22 proto=tcp
+  when: ssh.enable_sshd is defined and ssh.enable_sshd == True
+
+- name: ufw allow http traffic
+  ufw: rule=allow port=80 proto=tcp
+  when: ufw.http is defined and ufw.http == True
+
+- name: ufw allow https traffic
+  ufw: rule=allow port=443 proto=tcp
+  when: ufw.https is defined and ufw.https == True
+
+- name: ufw deny everything else
+  ufw: state=enabled policy=deny
+
+- name: ufw allow kubelet api
+  ufw: 
+    rule: allow
+    port: 10250
+    proto: tcp
+    src: "{{kubernetes.cidr}}"
+  when: kubernetes is defined
+
+- name: ufw allow kubernetes nodeport traffic
+  ufw: 
+    rule: allow
+    port: 30000:32767
+    proto: tcp
+    src: "{{kubernetes.cidr}}"
+  when: kubernetes is defined and kubernetes.master == False
+
+- name: ufw allow kubernetes api server
+  ufw: 
+    rule: allow
+    port: 6443
+    proto: tcp
+    src: "{{kubernetes.cidr}}"
+  when: kubernetes is defined and kubernetes.master == True
+
+- name: ufw allow kubernetes etcd server client API
+  ufw: 
+    rule: allow
+    port: 2379:2380
+    proto: tcp
+    src: "{{kubernetes.cidr}}"
+  when: kubernetes is defined and kubernetes.master == True
+
+- name: ufw allow kubernetes kube-scheduler
+  ufw: 
+    rule: allow
+    port: 10259
+    proto: tcp
+    src: "{{kubernetes.cidr}}"
+  when: kubernetes is defined and kubernetes.master == true
+  
+- name: ufw allow kubernetes kube-controller-manager
+  ufw: 
+    rule: allow
+    port: 10257
+    proto: tcp
+    src: "{{kubernetes.cidr}}"
+  when: kubernetes is defined and kubernetes.master == true
+
+- name: Set logging
+  ufw:
+    logging: 'on'

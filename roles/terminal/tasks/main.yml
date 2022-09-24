@@ -1,0 +1,30 @@
+---
+
+- name: Install terminal tools(apt)
+  apt:
+    name:
+      - exa
+      - bat
+      - fd-find
+      - ripgrep
+      - hyperfine
+      - bpytop
+      - delta
+      - fzf
+    state: latest
+    update_cache: true
+
+- name: Install terminal tools(snap)
+  community.general.snap:
+    name:
+      - procs
+      - dust
+      - starship
+
+- name: Install terminal tools(cargo)
+  community.general.cargo:
+    name: 
+      - tealdeer
+      - sd
+      - bandwhich
+      - grex
